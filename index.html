@@ -1,0 +1,1169 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f7f5ff">
+  <meta name="description" content="Belajar sistem kode warna dengan cara yang seru: eksplor RGB, HEX, HSL, dan main tebak warna.">
+  <title>Warna di Balik Kode — MPI Interaktif</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap');
+
+    :root {
+      color-scheme: light;
+      --ink: #202034;
+      --muted: #77768d;
+      --paper: #f7f5ff;
+      --white: #fff;
+      --purple: #7556ed;
+      --pink: #ff6a9c;
+      --mint: #58d8b3;
+      --yellow: #ffd76a;
+      --line: #e9e6f4;
+      --shadow: 0 18px 55px rgba(48, 37, 100, .09);
+      --heading: "Space Grotesk", "Trebuchet MS", sans-serif;
+      --body: "DM Sans", "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: 90px; }
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: var(--body);
+      line-height: 1.6;
+    }
+    button, input { font: inherit; }
+    button { color: inherit; }
+    a { color: inherit; }
+    .wrap { width: min(1120px, calc(100% - 40px)); margin-inline: auto; }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      border-bottom: 1px solid rgba(233, 230, 244, .8);
+      background: rgba(247, 245, 255, .88);
+      backdrop-filter: blur(16px);
+    }
+    .nav {
+      min-height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      font: 700 16px var(--heading);
+      letter-spacing: -.04em;
+    }
+    .brand-mark {
+      display: grid;
+      width: 34px;
+      aspect-ratio: 1;
+      place-items: center;
+      border-radius: 12px;
+      background: conic-gradient(from 25deg, #ff7b99, #ffc95e, #6edcb9, #7d68f1, #ff7b99);
+      color: white;
+      font-size: 19px;
+      box-shadow: 0 5px 14px #7556ed35;
+    }
+    .nav-links { display: flex; align-items: center; gap: 28px; }
+    .nav-links a {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: color .2s ease;
+    }
+    .nav-links a:hover { color: var(--purple); }
+    .nav-cta, .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      border: 0;
+      border-radius: 14px;
+      background: var(--ink);
+      color: white;
+      font-size: 13px;
+      font-weight: 800;
+      text-decoration: none;
+      cursor: pointer;
+      transition: transform .2s ease, box-shadow .2s ease, background .2s ease;
+    }
+    .nav-cta { padding: 11px 16px; }
+    .button { min-height: 48px; padding: 0 19px; }
+    .nav-cta:hover, .button:hover { transform: translateY(-2px); box-shadow: 0 10px 24px #20203422; }
+    .button.primary { background: var(--purple); }
+    .button.soft { background: #f0edff; color: var(--purple); }
+    .button:disabled { opacity: .58; cursor: not-allowed; transform: none; box-shadow: none; }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      padding: 78px 0 86px;
+      background:
+        radial-gradient(ellipse at 82% 24%, #ffd8e5 0, transparent 26%),
+        radial-gradient(ellipse at 8% 85%, #dcd5ff 0, transparent 30%);
+    }
+    .hero-grid { display: grid; grid-template-columns: 1.05fr .95fr; align-items: center; gap: 55px; }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 12px;
+      border: 1px solid #e8e2ff;
+      border-radius: 999px;
+      background: #ffffffa6;
+      color: var(--purple);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .07em;
+      text-transform: uppercase;
+    }
+    .eyebrow-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--pink); }
+    h1, h2, h3, p { margin-top: 0; }
+    h1, h2, h3 { font-family: var(--heading); letter-spacing: -.055em; }
+    h1 { max-width: 610px; margin: 20px 0 18px; font-size: clamp(46px, 6.3vw, 75px); line-height: .99; }
+    .gradient-text {
+      color: var(--purple);
+      background: linear-gradient(100deg, #7656ed 10%, #ea67a1 70%, #f5a745);
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .hero-copy { max-width: 490px; margin-bottom: 25px; color: var(--muted); font-size: 16px; }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: 11px; }
+    .hero-note { display: flex; align-items: center; gap: 9px; margin-top: 24px; color: var(--muted); font-size: 12px; }
+    .avatar-stack { display: flex; }
+    .avatar-stack span {
+      display: grid;
+      width: 27px;
+      height: 27px;
+      margin-left: -6px;
+      place-items: center;
+      border: 2px solid var(--paper);
+      border-radius: 50%;
+      background: var(--yellow);
+      font-size: 12px;
+    }
+    .avatar-stack span:first-child { margin-left: 0; background: var(--mint); }
+    .avatar-stack span:last-child { background: #ffb5ce; }
+
+    .hero-art { position: relative; min-height: 360px; display: grid; place-items: center; }
+    .color-orbit {
+      position: absolute;
+      width: min(370px, 88%);
+      aspect-ratio: 1;
+      border: 1px dashed #b6a8f3;
+      border-radius: 50%;
+      animation: orbit 35s linear infinite;
+    }
+    @keyframes orbit { to { transform: rotate(360deg); } }
+    .orbit-dot { position: absolute; width: 20px; height: 20px; border: 4px solid var(--paper); border-radius: 50%; }
+    .orbit-dot.one { top: 12%; left: 20%; background: var(--pink); }
+    .orbit-dot.two { right: 3%; top: 48%; width: 26px; height: 26px; background: var(--mint); }
+    .orbit-dot.three { bottom: 7%; left: 25%; width: 15px; height: 15px; background: var(--yellow); }
+    .color-card {
+      position: relative;
+      z-index: 1;
+      width: min(310px, 83%);
+      padding: 15px;
+      border: 1px solid #ffffffc9;
+      border-radius: 26px;
+      background: #ffffffd9;
+      box-shadow: 0 24px 70px #44328a22;
+      transform: rotate(-4deg);
+    }
+    .color-preview {
+      height: 176px;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      border-radius: 17px;
+      background: linear-gradient(135deg, #fe718f, #f8b86b 48%, #9a7bff);
+    }
+    .color-preview span { color: #fff; font: 700 40px var(--heading); text-shadow: 0 2px 16px #381b4a40; }
+    .color-card-foot { display: flex; justify-content: space-between; align-items: center; padding: 13px 3px 1px; }
+    .color-card-foot strong { font: 700 13px var(--heading); }
+    .color-card-foot small { color: var(--muted); font-size: 11px; }
+    .mini-chip {
+      position: absolute;
+      z-index: 2;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 13px;
+      border: 1px solid #fff;
+      border-radius: 14px;
+      background: white;
+      box-shadow: 0 10px 30px #44328a1c;
+      font: 700 12px var(--heading);
+      animation: bob 4s ease-in-out infinite;
+    }
+    .mini-chip.rgb { top: 16%; right: 4%; }
+    .mini-chip.pixel { bottom: 12%; right: 9%; animation-delay: -1s; }
+    .mini-chip .chip-dot { width: 12px; height: 12px; border-radius: 4px; background: var(--mint); }
+    @keyframes bob { 50% { transform: translateY(-8px) rotate(2deg); } }
+
+    .section { padding: 84px 0; }
+    .section-kicker { color: var(--purple); font-size: 11px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+    .section-heading { max-width: 650px; margin: 10px 0 13px; font-size: clamp(34px, 4.2vw, 48px); line-height: 1.07; }
+    .section-intro { max-width: 620px; margin-bottom: 32px; color: var(--muted); font-size: 15px; }
+    .center-heading { text-align: center; }
+    .center-heading .section-heading, .center-heading .section-intro { margin-inline: auto; }
+    .concepts { background: white; }
+    .concept-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 17px; }
+    .concept-card {
+      position: relative;
+      min-height: 245px;
+      padding: 23px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      background: white;
+      transition: transform .2s ease, box-shadow .2s ease;
+    }
+    .concept-card:hover { transform: translateY(-5px); box-shadow: var(--shadow); }
+    .concept-icon {
+      display: grid;
+      width: 47px;
+      aspect-ratio: 1;
+      place-items: center;
+      border-radius: 15px;
+      background: #f0edff;
+      color: var(--purple);
+      font: 800 17px var(--heading);
+    }
+    .concept-card:nth-child(2) .concept-icon { background: #fff0f5; color: #e85888; }
+    .concept-card:nth-child(3) .concept-icon { background: #e8faf5; color: #239c7a; }
+    .concept-card h3 { margin: 20px 0 8px; font-size: 22px; }
+    .concept-card p { margin-bottom: 0; color: var(--muted); font-size: 13px; }
+    .example-code {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      margin-top: 16px;
+      padding: 7px 10px;
+      border-radius: 9px;
+      background: #f8f7fc;
+      font: 700 12px ui-monospace, SFMono-Regular, Consolas, monospace;
+    }
+    .example-code i { width: 12px; height: 12px; border-radius: 4px; background: #ff6b85; }
+    .concept-card:nth-child(2) .example-code i { background: #7354e8; }
+    .concept-card:nth-child(3) .example-code i { background: #23bb91; }
+
+    .playground { background: #f0edff; }
+    .playground-layout { display: grid; grid-template-columns: .9fr 1.1fr; gap: 45px; align-items: center; }
+    .play-card {
+      padding: 25px;
+      border: 1px solid #fff;
+      border-radius: 25px;
+      background: white;
+      box-shadow: 0 15px 40px #44328a13;
+    }
+    .play-color {
+      height: 190px;
+      display: grid;
+      place-items: center;
+      margin-bottom: 20px;
+      border-radius: 18px;
+      background: #7556ed;
+      transition: background-color .12s linear;
+    }
+    .play-color span { padding: 6px 11px; border-radius: 9px; background: #00000028; color: white; font: 700 19px var(--heading); }
+    .play-controls { display: grid; gap: 14px; }
+    .range-row { display: grid; grid-template-columns: 40px 1fr 35px; align-items: center; gap: 10px; }
+    .range-label { font: 800 12px var(--heading); }
+    .range-row output { color: var(--muted); font: 700 11px ui-monospace, monospace; text-align: right; }
+    input[type="range"] { width: 100%; height: 6px; border-radius: 99px; appearance: none; background: #edeaf5; cursor: pointer; }
+    input[type="range"]::-webkit-slider-thumb { width: 17px; height: 17px; appearance: none; border: 3px solid white; border-radius: 50%; background: var(--purple); box-shadow: 0 2px 6px #20203435; }
+    input[type="range"]::-moz-range-thumb { width: 12px; height: 12px; border: 3px solid white; border-radius: 50%; background: var(--purple); box-shadow: 0 2px 6px #20203435; }
+    .hex-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 21px; padding: 12px 14px; border-radius: 13px; background: #f7f5ff; }
+    .hex-row span { color: var(--muted); font-size: 11px; font-weight: 700; }
+    .hex-value { font: 800 15px ui-monospace, SFMono-Regular, Consolas, monospace; }
+    .copy-button {
+      padding: 7px 10px;
+      border: 0;
+      border-radius: 9px;
+      background: white;
+      color: var(--purple);
+      font-size: 11px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    .copy-button:hover { background: #ede9ff; }
+    .rgb-readout { margin: 12px 0 0; color: var(--muted); font: 11px ui-monospace, monospace; text-align: center; }
+    .fact-list { display: grid; gap: 15px; margin-top: 27px; }
+    .fact { display: flex; align-items: flex-start; gap: 12px; }
+    .fact-mark { display: grid; flex: 0 0 auto; width: 25px; height: 25px; place-items: center; border-radius: 9px; background: white; color: var(--purple); font-size: 13px; font-weight: 900; }
+    .fact strong { display: block; margin-bottom: 2px; font-size: 13px; }
+    .fact p { margin: 0; color: var(--muted); font-size: 12px; }
+
+    .hex-section { background: white; }
+    .hex-section-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: stretch; }
+    .hex-panel {
+      padding: 24px;
+      border: 1px solid var(--line);
+      border-radius: 23px;
+      background: #fcfbff;
+    }
+    .hex-panel-heading { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 18px; }
+    .hex-panel-heading h3 { margin: 0 0 4px; font-size: 21px; }
+    .hex-panel-heading p { margin: 0; color: var(--muted); font-size: 12px; }
+    .hex-badge { padding: 6px 9px; border-radius: 9px; background: #f0edff; color: var(--purple); font: 800 10px var(--heading); white-space: nowrap; }
+    .hex-input-label { display: block; margin-bottom: 7px; font-size: 11px; font-weight: 800; }
+    .hex-input-row { display: grid; grid-template-columns: 1fr auto; gap: 8px; }
+    .hex-input {
+      min-width: 0;
+      height: 48px;
+      padding: 0 13px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      outline: 0;
+      background: white;
+      color: var(--ink);
+      font: 800 15px ui-monospace, SFMono-Regular, Consolas, monospace;
+      text-transform: uppercase;
+      transition: border-color .2s ease, box-shadow .2s ease;
+    }
+    .hex-input:focus { border-color: #9c87f1; box-shadow: 0 0 0 3px #7556ed1a; }
+    .hex-input[aria-invalid="true"] { border-color: #e85888; }
+    .hex-submit { min-height: 48px; padding-inline: 14px; }
+    .hex-help, .hex-error { min-height: 19px; margin: 7px 0 0; font-size: 10px; }
+    .hex-help { color: var(--muted); }
+    .hex-error { color: #d95178; font-weight: 700; }
+    .hex-conversion-result { margin-top: 15px; }
+    .hex-color-preview {
+      display: grid;
+      grid-template-columns: 66px 1fr;
+      align-items: center;
+      gap: 13px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 15px;
+      background: white;
+    }
+    .hex-color-swatch { width: 66px; height: 58px; border-radius: 11px; background: #ff6b85; }
+    .hex-rgb-label { display: block; margin-bottom: 2px; color: var(--muted); font-size: 10px; font-weight: 800; }
+    .hex-rgb-value { font: 800 16px ui-monospace, SFMono-Regular, Consolas, monospace; }
+    .hex-channel-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 10px; }
+    .hex-channel {
+      min-width: 0;
+      padding: 11px 9px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: white;
+    }
+    .hex-channel-top { display: flex; justify-content: space-between; align-items: center; gap: 4px; }
+    .hex-channel-name { font: 800 11px var(--heading); }
+    .hex-channel-hex { color: var(--muted); font: 700 10px ui-monospace, monospace; }
+    .hex-channel-value { display: block; margin: 4px 0; font: 800 18px var(--heading); }
+    .hex-channel-formula { display: block; color: var(--muted); font: 9px ui-monospace, monospace; white-space: nowrap; }
+    .hex-rule { margin: 13px 0 0; padding: 10px 12px; border-radius: 11px; background: #f0edff; color: #5d4cb2; font-size: 10px; }
+    .hex-rule b { font-family: ui-monospace, monospace; }
+    .quiz-status-row { display: flex; justify-content: space-between; gap: 10px; margin: 4px 0 12px; color: var(--muted); font-size: 11px; font-weight: 800; }
+    .quiz-status-row b { color: var(--ink); }
+    .quiz-progress { height: 6px; margin-bottom: 18px; overflow: hidden; border-radius: 99px; background: #ece9f4; }
+    .quiz-progress-fill { width: 0; height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--mint), #75b7f5); transition: width .3s ease; }
+    .quiz-instructions { display: grid; min-height: 185px; align-content: center; justify-items: center; padding: 18px; border: 1px dashed #d9d3ee; border-radius: 16px; background: white; text-align: center; }
+    .quiz-instructions span { font-size: 32px; }
+    .quiz-instructions p { max-width: 280px; margin: 8px 0 0; color: var(--muted); font-size: 12px; }
+    .quiz-question { margin-bottom: 12px; font-size: 12px; font-weight: 700; }
+    .quiz-target { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; padding: 10px; border: 1px solid var(--line); border-radius: 13px; background: white; }
+    .quiz-swatch { width: 43px; height: 43px; flex: 0 0 auto; border-radius: 10px; background: #ff6b85; }
+    .quiz-target small { display: block; color: var(--muted); font-size: 9px; font-weight: 800; }
+    .quiz-target code { font: 800 14px ui-monospace, monospace; }
+    .quiz-options { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .quiz-answer {
+      min-height: 51px;
+      padding: 8px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: white;
+      font: 700 10px ui-monospace, SFMono-Regular, Consolas, monospace;
+      cursor: pointer;
+      transition: transform .16s ease, border .16s ease, background .16s ease;
+    }
+    .quiz-answer:hover:not(:disabled) { transform: translateY(-2px); border-color: #b9aaf5; }
+    .quiz-answer.correct { border-color: #50c99f; background: #e9faf4; }
+    .quiz-answer.wrong { border-color: #f17b9b; background: #fff0f4; }
+    .quiz-answer:disabled { cursor: default; }
+    .quiz-feedback { min-height: 37px; margin: 10px 0 8px; color: var(--muted); font-size: 10px; font-weight: 700; }
+    .quiz-action { min-height: 40px; padding-inline: 15px; font-size: 11px; }
+    .quiz-instructions[hidden], #quizQuestionArea[hidden], .quiz-action[hidden] { display: none; }
+
+    .game-section { background: white; }
+    .game-shell {
+      position: relative;
+      overflow: hidden;
+      padding: 30px;
+      border: 1px solid var(--line);
+      border-radius: 27px;
+      background: #fcfbff;
+    }
+    .game-shell::before, .game-shell::after {
+      position: absolute;
+      width: 180px;
+      aspect-ratio: 1;
+      border-radius: 50%;
+      content: "";
+      pointer-events: none;
+      filter: blur(1px);
+    }
+    .game-shell::before { top: -105px; right: -40px; background: #ffdeea80; }
+    .game-shell::after { bottom: -130px; left: -60px; background: #ded8ff8a; }
+    .game-top, .game-content, .game-result { position: relative; z-index: 1; }
+    .game-top { display: flex; justify-content: space-between; align-items: center; gap: 14px; margin-bottom: 22px; }
+    .game-top h3 { margin: 0; font-size: 20px; }
+    .game-stats { display: flex; gap: 9px; }
+    .stat-pill { padding: 7px 11px; border: 1px solid var(--line); border-radius: 999px; background: white; color: var(--muted); font-size: 11px; font-weight: 800; }
+    .stat-pill b { margin-left: 4px; color: var(--ink); }
+    .progress-track { height: 7px; margin-bottom: 22px; overflow: hidden; border-radius: 99px; background: #ece9f4; }
+    .progress-fill { width: 0%; height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--purple), var(--pink)); transition: width .3s ease; }
+    .game-prompt { margin: 0 0 16px; color: var(--muted); font-size: 13px; font-weight: 700; text-align: center; }
+    .target-swatch {
+      width: 100%;
+      height: 150px;
+      display: grid;
+      place-items: center;
+      border: 5px solid white;
+      border-radius: 20px;
+      background: #7556ed;
+      box-shadow: 0 8px 22px #20203412;
+    }
+    .target-swatch span { padding: 6px 10px; border-radius: 8px; background: #00000024; color: white; font: 700 13px ui-monospace, monospace; }
+    .answer-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 11px; margin-top: 16px; }
+    .answer {
+      min-height: 65px;
+      padding: 12px 8px;
+      border: 1px solid var(--line);
+      border-radius: 15px;
+      background: white;
+      font: 800 13px ui-monospace, SFMono-Regular, Consolas, monospace;
+      cursor: pointer;
+      transition: transform .16s ease, border .16s ease, background .16s ease;
+    }
+    .answer:hover:not(:disabled) { transform: translateY(-3px); border-color: #b9aaf5; }
+    .answer.color-option { display: flex; align-items: center; justify-content: center; gap: 9px; }
+    .answer-color { width: 25px; height: 25px; flex: 0 0 auto; border: 2px solid white; border-radius: 8px; box-shadow: 0 0 0 1px #e5e2ed; }
+    .answer.correct { border-color: #50c99f; background: #e9faf4; }
+    .answer.wrong { border-color: #f17b9b; background: #fff0f4; }
+    .answer:disabled { cursor: default; }
+    .game-feedback { min-height: 25px; margin: 13px 0 0; color: var(--muted); font-size: 12px; font-weight: 700; text-align: center; }
+    .game-actions { display: flex; justify-content: center; margin-top: 17px; }
+    .game-actions .button { min-width: 160px; }
+    .mode-switch {
+      display: inline-flex;
+      gap: 4px;
+      padding: 4px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: white;
+    }
+    .mode-button { padding: 7px 10px; border: 0; border-radius: 9px; background: transparent; color: var(--muted); font-size: 10px; font-weight: 800; cursor: pointer; }
+    .mode-button[aria-pressed="true"] { background: #f0edff; color: var(--purple); }
+    .game-header-actions { display: flex; align-items: center; gap: 10px; }
+    .game-result { display: none; padding: 25px 0 5px; text-align: center; }
+    .game-result.visible { display: block; }
+    .result-emoji { font-size: 45px; }
+    .game-result h3 { margin: 8px 0; font-size: 32px; }
+    .game-result p { color: var(--muted); }
+    .game-result strong { color: var(--purple); }
+
+    .video-section { background: linear-gradient(135deg, #292446, #433774); color: white; }
+    .video-layout { display: grid; grid-template-columns: .8fr 1.2fr; align-items: center; gap: 45px; }
+    .video-section .section-kicker { color: #c4b8ff; }
+    .video-section .section-heading { color: white; }
+    .video-section .section-intro { color: #d3cee4; }
+    .video-frame {
+      position: relative;
+      min-height: 290px;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      border: 1px solid #ffffff2c;
+      border-radius: 23px;
+      background:
+        radial-gradient(circle at 20% 30%, #ff76985c 0 10%, transparent 29%),
+        radial-gradient(circle at 80% 75%, #64dbb453 0 12%, transparent 32%),
+        linear-gradient(140deg, #554a82, #302a4e);
+    }
+    .video-frame::before {
+      position: absolute;
+      inset: 0;
+      background-image: linear-gradient(#ffffff08 1px, transparent 1px), linear-gradient(90deg, #ffffff08 1px, transparent 1px);
+      background-size: 32px 32px;
+      content: "";
+    }
+    .video-inner { position: relative; text-align: center; }
+    .play-icon {
+      width: 65px;
+      height: 65px;
+      display: grid;
+      margin: 0 auto 15px;
+      place-items: center;
+      border: 1px solid #ffffff66;
+      border-radius: 50%;
+      background: #ffffff20;
+      color: white;
+      font-size: 22px;
+    }
+    .video-inner strong { display: block; font: 700 15px var(--heading); }
+    .video-inner small { display: block; margin-top: 5px; color: #d4cee9; font-size: 11px; }
+    .video-caption { position: absolute; bottom: 13px; left: 15px; color: #dfd9f3; font-size: 10px; }
+    .video-placeholder-note { margin: 12px 0 0; color: #c7c0dc; font-size: 11px; text-align: center; }
+    .footer { padding: 25px 0; background: #24213b; color: #c1bdd0; }
+    .footer-inner { display: flex; justify-content: space-between; gap: 15px; font-size: 11px; }
+    .footer strong { color: white; font-family: var(--heading); }
+    .toast {
+      position: fixed;
+      z-index: 50;
+      right: 20px;
+      bottom: 20px;
+      padding: 12px 16px;
+      border-radius: 12px;
+      background: var(--ink);
+      color: white;
+      font-size: 12px;
+      font-weight: 700;
+      opacity: 0;
+      transform: translateY(10px);
+      pointer-events: none;
+      transition: .2s ease;
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+
+    @media (max-width: 800px) {
+      .hero-grid { grid-template-columns: 1fr; gap: 15px; }
+      .hero { padding: 58px 0 45px; }
+      .hero-art { min-height: 315px; }
+      .playground-layout, .video-layout { grid-template-columns: 1fr; gap: 32px; }
+      .hex-section-layout { grid-template-columns: 1fr; }
+      .concept-grid { gap: 11px; }
+      .concept-card { padding: 18px; }
+    }
+    @media (max-width: 590px) {
+      .wrap { width: min(100% - 28px, 1120px); }
+      .nav { min-height: 63px; }
+      .nav-links { display: none; }
+      .nav-cta { padding: 9px 12px; font-size: 11px; }
+      .brand { font-size: 14px; }
+      .hero { padding-top: 48px; }
+      h1 { font-size: clamp(43px, 14vw, 61px); }
+      .hero-copy { font-size: 14px; }
+      .hero-art { min-height: 290px; }
+      .color-preview { height: 155px; }
+      .mini-chip.rgb { right: 0; }
+      .mini-chip.pixel { right: 0; }
+      .section { padding: 62px 0; }
+      .concept-grid { grid-template-columns: 1fr; }
+      .concept-card { min-height: auto; }
+      .concept-card h3 { margin-top: 14px; }
+      .play-card { padding: 17px; }
+      .play-color { height: 165px; }
+      .hex-panel { padding: 17px; }
+      .hex-channel-grid { gap: 5px; }
+      .hex-channel { padding: 9px 6px; }
+      .hex-channel-formula { font-size: 8px; }
+      .game-shell { padding: 18px 13px; border-radius: 21px; }
+      .game-top { align-items: flex-start; flex-direction: column; }
+      .game-header-actions { width: 100%; justify-content: space-between; }
+      .game-stats { gap: 5px; }
+      .stat-pill { padding: 6px 8px; font-size: 10px; }
+      .answer-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+      .answer { min-height: 57px; font-size: 12px; }
+      .target-swatch { height: 130px; }
+      .video-frame { min-height: 230px; }
+      .footer-inner { flex-direction: column; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <nav class="nav wrap" aria-label="Navigasi utama">
+      <a class="brand" href="#beranda"><span class="brand-mark" aria-hidden="true">✳</span> Warna di Balik Kode</a>
+      <div class="nav-links">
+        <a href="#belajar">Belajar</a>
+        <a href="#playground">Eksplor warna</a>
+        <a href="#konversi">HEX → RGB</a>
+        <a href="#minigame">Minigame</a>
+        <a href="#video">Video AI</a>
+      </div>
+      <a class="nav-cta" href="#minigame">Main sekarang <span aria-hidden="true">↗</span></a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero" id="beranda">
+      <div class="hero-grid wrap">
+        <div>
+          <span class="eyebrow"><span class="eyebrow-dot"></span> MPI · Informatika</span>
+          <h1>Warna punya <span class="gradient-text">bahasa rahasia.</span></h1>
+          <p class="hero-copy">Di balik setiap warna di layar, ada kode yang bisa dibaca. Yuk, kenalan dengan RGB, HEX, dan HSL lewat eksperimen kecil yang seru.</p>
+          <div class="hero-actions">
+            <a class="button primary" href="#belajar">Mulai eksplorasi <span aria-hidden="true">↓</span></a>
+            <a class="button soft" href="#minigame">Langsung main <span aria-hidden="true">✦</span></a>
+          </div>
+          <div class="hero-note">
+            <div class="avatar-stack" aria-hidden="true"><span>🎨</span><span>🟣</span><span>🟡</span></div>
+            <span>Belajar visual, satu warna dalam satu waktu</span>
+          </div>
+        </div>
+        <div class="hero-art" aria-label="Ilustrasi kode warna">
+          <div class="color-orbit" aria-hidden="true">
+            <span class="orbit-dot one"></span><span class="orbit-dot two"></span><span class="orbit-dot three"></span>
+          </div>
+          <div class="color-card">
+            <div class="color-preview"><span>#FF6B85</span></div>
+            <div class="color-card-foot"><strong>Coral Pop</strong><small>Warna punya kode!</small></div>
+          </div>
+          <div class="mini-chip rgb"><span class="chip-dot"></span> R 255 · G 107 · B 133</div>
+          <div class="mini-chip pixel"><span class="chip-dot"></span> 24-bit color ✨</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section concepts" id="belajar">
+      <div class="wrap">
+        <div class="center-heading">
+          <span class="section-kicker">Kenalan dulu, yuk!</span>
+          <h2 class="section-heading">Satu warna, beberapa cara <span class="gradient-text">bercerita.</span></h2>
+          <p class="section-intro">Komputer menyimpan warna sebagai angka. Sistem yang berbeda hanya punya cara penulisan yang berbeda pula.</p>
+        </div>
+        <div class="concept-grid">
+          <article class="concept-card">
+            <div class="concept-icon" aria-hidden="true">RGB</div>
+            <h3>RGB</h3>
+            <p>Warna dari campuran cahaya <b>Red, Green, Blue</b>. Tiap kanal bernilai 0 sampai 255. Makin tinggi nilainya, makin terang cahayanya.</p>
+            <span class="example-code"><i></i> rgb(255, 107, 133)</span>
+          </article>
+          <article class="concept-card">
+            <div class="concept-icon" aria-hidden="true">#</div>
+            <h3>HEX</h3>
+            <p>Kode ringkas berbasis heksadesimal. Dua digit pertama untuk merah, berikutnya hijau, lalu biru. Praktis dipakai di desain web.</p>
+            <span class="example-code"><i></i> #FF6B85</span>
+          </article>
+          <article class="concept-card">
+            <div class="concept-icon" aria-hidden="true">HSL</div>
+            <h3>HSL</h3>
+            <p>Warna dijelaskan lewat <b>Hue</b> (jenis warna), <b>Saturation</b> (intensitas), dan <b>Lightness</b> (terang-gelap).</p>
+            <span class="example-code"><i></i> hsl(348, 100%, 71%)</span>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section playground" id="playground">
+      <div class="playground-layout wrap">
+        <div>
+          <span class="section-kicker">Studio warna mini</span>
+          <h2 class="section-heading">Geser, campur, temukan <span class="gradient-text">warnamu.</span></h2>
+          <p class="section-intro">Coba atur intensitas cahaya merah, hijau, dan biru. Perhatikan bagaimana angka-angka kecil mengubah warna di layar.</p>
+          <div class="fact-list">
+            <div class="fact"><span class="fact-mark">✓</span><div><strong>Setiap kanal punya 256 kemungkinan</strong><p>Dari 0 (tidak ada cahaya) hingga 255 (cahaya maksimal).</p></div></div>
+            <div class="fact"><span class="fact-mark">✓</span><div><strong>Kombinasinya bisa lebih dari 16 juta</strong><p>256 × 256 × 256 kombinasi RGB, banyak sekali pilihan!</p></div></div>
+          </div>
+        </div>
+        <div class="play-card">
+          <div class="play-color" id="playColor"><span>Warna pilihanmu</span></div>
+          <div class="play-controls">
+            <label class="range-row"><span class="range-label">R</span><input type="range" min="0" max="255" value="117" data-channel="r" aria-label="Atur kanal merah"><output>117</output></label>
+            <label class="range-row"><span class="range-label">G</span><input type="range" min="0" max="255" value="86" data-channel="g" aria-label="Atur kanal hijau"><output>86</output></label>
+            <label class="range-row"><span class="range-label">B</span><input type="range" min="0" max="255" value="237" data-channel="b" aria-label="Atur kanal biru"><output>237</output></label>
+          </div>
+          <div class="hex-row">
+            <div><span>KODE HEX</span><div class="hex-value" id="hexValue">#7556ED</div></div>
+            <button class="copy-button" id="copyHex" type="button">Salin kode</button>
+          </div>
+          <p class="rgb-readout" id="rgbValue">rgb(117, 86, 237)</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section hex-section" id="konversi">
+      <div class="wrap">
+        <div class="center-heading">
+          <span class="section-kicker">Bongkar kode warna</span>
+          <h2 class="section-heading">Dari HEX jadi warna, <span class="gradient-text">langkah demi langkah.</span></h2>
+          <p class="section-intro">Pecah enam digit HEX menjadi tiga pasangan, lalu ubah setiap pasangan ke desimal untuk mendapatkan nilai RGB.</p>
+        </div>
+        <div class="hex-section-layout">
+          <article class="hex-panel">
+            <div class="hex-panel-heading">
+              <div><h3>🔍 Konverter HEX</h3><p>Masukkan kode warna enam digit.</p></div>
+              <span class="hex-badge">HEX → RGB</span>
+            </div>
+            <form id="hexForm" novalidate>
+              <label class="hex-input-label" for="hexInput">Kode warna HEX</label>
+              <div class="hex-input-row">
+                <input class="hex-input" id="hexInput" type="text" value="#FF6B85" maxlength="7" autocomplete="off" spellcheck="false" aria-describedby="hexHelp hexError" aria-invalid="false">
+                <button class="button primary hex-submit" type="submit">Konversi <span aria-hidden="true">→</span></button>
+              </div>
+              <p class="hex-help" id="hexHelp">Boleh pakai atau tanpa #, contoh: #FF6B85. Gunakan 0–9 dan A–F.</p>
+              <p class="hex-error" id="hexError" aria-live="polite"></p>
+            </form>
+            <div class="hex-conversion-result" id="hexConversionResult">
+              <div class="hex-color-preview">
+                <div class="hex-color-swatch" id="hexColorSwatch" aria-label="Pratinjau warna"></div>
+                <div><span class="hex-rgb-label">HASIL RGB</span><strong class="hex-rgb-value" id="hexRgbValue">rgb(255, 107, 133)</strong></div>
+              </div>
+              <div class="hex-channel-grid" aria-label="Rincian konversi kanal warna">
+                <div class="hex-channel"><div class="hex-channel-top"><span class="hex-channel-name">R · Merah</span><span class="hex-channel-hex" id="hexRPair">FF</span></div><strong class="hex-channel-value" id="hexRValue">255</strong><small class="hex-channel-formula" id="hexRFormula">15×16 + 15 = 255</small></div>
+                <div class="hex-channel"><div class="hex-channel-top"><span class="hex-channel-name">G · Hijau</span><span class="hex-channel-hex" id="hexGPair">6B</span></div><strong class="hex-channel-value" id="hexGValue">107</strong><small class="hex-channel-formula" id="hexGFormula">6×16 + 11 = 107</small></div>
+                <div class="hex-channel"><div class="hex-channel-top"><span class="hex-channel-name">B · Biru</span><span class="hex-channel-hex" id="hexBPair">85</span></div><strong class="hex-channel-value" id="hexBValue">133</strong><small class="hex-channel-formula" id="hexBFormula">8×16 + 5 = 133</small></div>
+              </div>
+              <p class="hex-rule">Ingat: <b>AB</b> dalam HEX = <b>A × 16 + B</b> dalam desimal. Huruf A–F bernilai 10–15.</p>
+            </div>
+          </article>
+
+          <article class="hex-panel" id="hexQuiz">
+            <div class="hex-panel-heading">
+              <div><h3>⚡ Latihan cepat</h3><p>Ubah kode HEX menjadi nilai RGB.</p></div>
+              <span class="hex-badge">5 SOAL</span>
+            </div>
+            <div class="quiz-status-row"><span id="quizRound">Siap mulai</span><span>Skor <b id="quizScore">0</b></span></div>
+            <div class="quiz-progress" aria-label="Progres latihan"><div class="quiz-progress-fill" id="quizProgress"></div></div>
+            <div class="quiz-instructions" id="quizInstructions">
+              <span aria-hidden="true">🧠</span>
+              <p>Lihat kode warnanya, hitung setiap pasangan digit HEX, lalu pilih kombinasi RGB yang benar.</p>
+            </div>
+            <div id="quizQuestionArea" hidden>
+              <p class="quiz-question">Berapa nilai RGB untuk warna ini?</p>
+              <div class="quiz-target"><div class="quiz-swatch" id="quizSwatch"></div><div><small>KODE WARNA</small><code id="quizHex"></code></div></div>
+              <div class="quiz-options" id="quizOptions"></div>
+            </div>
+            <p class="quiz-feedback" id="quizFeedback" aria-live="polite"></p>
+            <button class="button primary quiz-action" id="quizButton" type="button">Mulai latihan <span aria-hidden="true">✦</span></button>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section game-section" id="minigame">
+      <div class="wrap">
+        <div class="center-heading">
+          <span class="section-kicker">Saatnya tantangan!</span>
+          <h2 class="section-heading">Siap adu <span class="gradient-text">mata warna?</span></h2>
+          <p class="section-intro">Delapan ronde cepat. Pilih jawaban sebelum waktunya habis, kumpulkan poin, dan pecahkan rekor pribadimu!</p>
+        </div>
+        <div class="game-shell">
+          <div class="game-top">
+            <h3>🎯 Misi: Tebak Kode</h3>
+            <div class="game-header-actions">
+              <div class="mode-switch" role="group" aria-label="Pilih mode permainan">
+                <button class="mode-button" type="button" data-mode="code" aria-pressed="true">Kode → Warna</button>
+                <button class="mode-button" type="button" data-mode="color" aria-pressed="false">Warna → Kode</button>
+              </div>
+              <div class="game-stats">
+                <span class="stat-pill">Skor <b id="score">0</b></span>
+                <span class="stat-pill">Combo <b id="streak">0×</b></span>
+                <span class="stat-pill">Waktu <b id="timer">45</b>s</span>
+              </div>
+            </div>
+          </div>
+          <div class="game-content" id="gameContent">
+            <div class="progress-track" aria-label="Progres permainan"><div class="progress-fill" id="progress"></div></div>
+            <p class="game-prompt" id="gamePrompt">Cocokkan kode ini dengan warna yang tepat.</p>
+            <div class="target-swatch" id="targetSwatch" aria-label="Warna target"><span id="targetCode">#7556ED</span></div>
+            <div class="answer-grid" id="answerGrid"></div>
+            <p class="game-feedback" id="gameFeedback" aria-live="polite">Jawaban benar = 100 poin. Combo bikin skor makin tinggi!</p>
+            <div class="game-actions"><button class="button primary" id="startGame" type="button">Mulai main <span aria-hidden="true">✦</span></button></div>
+          </div>
+          <div class="game-result" id="gameResult" aria-live="polite"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section video-section" id="video">
+      <div class="video-layout wrap">
+        <div>
+          <span class="section-kicker">Segera hadir</span>
+          <h2 class="section-heading">Cerita warna dalam <span class="gradient-text">versi video.</span></h2>
+          <p class="section-intro">Bagian ini sudah disiapkan untuk video AI pembelajaran. Nanti cukup ganti placeholder ini dengan video pilihanmu.</p>
+        </div>
+        <div>
+          <div class="video-frame" id="videoPlaceholder" aria-label="Placeholder video pembelajaran">
+            <div class="video-inner">
+              <div class="play-icon" aria-hidden="true">▶</div>
+              <strong>Video AI Pembelajaran</strong>
+              <small>Area siap diganti dengan video AI</small>
+            </div>
+            <span class="video-caption">MPI · Sistem di Balik Kode Warna</span>
+          </div>
+          <p class="video-placeholder-note">Slot siap untuk URL video YouTube atau elemen <code>&lt;video&gt;</code> milikmu.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner wrap"><strong>✳ Warna di Balik Kode</strong><span>Media Pembelajaran Interaktif · Belajar sambil bereksperimen.</span></div>
+  </footer>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    (() => {
+      const ranges = [...document.querySelectorAll('input[type="range"]')];
+      const playColor = document.getElementById('playColor');
+      const hexValue = document.getElementById('hexValue');
+      const rgbValue = document.getElementById('rgbValue');
+      const toast = document.getElementById('toast');
+      let toastTimeout;
+
+      const toHex = (value) => Number(value).toString(16).padStart(2, '0').toUpperCase();
+      const colorCode = ({ r, g, b }) => `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+      const colorCss = ({ r, g, b }) => `rgb(${r}, ${g}, ${b})`;
+      const readColor = () => Object.fromEntries(ranges.map((range) => [range.dataset.channel, Number(range.value)]));
+
+      function showToast(message) {
+        toast.textContent = message;
+        toast.classList.add('show');
+        clearTimeout(toastTimeout);
+        toastTimeout = setTimeout(() => toast.classList.remove('show'), 1800);
+      }
+
+      function updatePlayground() {
+        const color = readColor();
+        const hex = colorCode(color);
+        playColor.style.backgroundColor = colorCss(color);
+        hexValue.textContent = hex;
+        rgbValue.textContent = colorCss(color);
+        ranges.forEach((range) => { range.nextElementSibling.value = range.value; });
+      }
+      ranges.forEach((range) => range.addEventListener('input', updatePlayground));
+      document.getElementById('copyHex').addEventListener('click', async () => {
+        try {
+          await navigator.clipboard.writeText(hexValue.textContent);
+          showToast(`${hexValue.textContent} berhasil disalin!`);
+        } catch (error) {
+          showToast('Clipboard tidak tersedia. Salin kode secara manual, ya.');
+        }
+      });
+
+      const ROUND_COUNT = 8;
+      const game = {
+        active: false,
+        mode: 'code',
+        round: 0,
+        score: 0,
+        streak: 0,
+        timeLeft: 45,
+        timerId: null,
+        target: null,
+        locked: false
+      };
+      const gameContent = document.getElementById('gameContent');
+      const gameResult = document.getElementById('gameResult');
+      const answerGrid = document.getElementById('answerGrid');
+      const targetSwatch = document.getElementById('targetSwatch');
+      const targetCode = document.getElementById('targetCode');
+      const feedback = document.getElementById('gameFeedback');
+      const prompt = document.getElementById('gamePrompt');
+      const startButton = document.getElementById('startGame');
+      const palette = [
+        { name: 'Coral', hex: '#FF6B85' },
+        { name: 'Lavender', hex: '#9B83F5' },
+        { name: 'Mint', hex: '#52D6B0' },
+        { name: 'Sunshine', hex: '#FFC857' },
+        { name: 'Ocean', hex: '#3D8BDB' },
+        { name: 'Grape', hex: '#743FC8' },
+        { name: 'Peach', hex: '#FF9C78' },
+        { name: 'Sky', hex: '#61C7E8' },
+        { name: 'Berry', hex: '#D94F91' },
+        { name: 'Lime', hex: '#A8D84E' },
+        { name: 'Indigo', hex: '#4C51BF' },
+        { name: 'Rose', hex: '#F27CA5' },
+        { name: 'Teal', hex: '#168F8A' },
+        { name: 'Amber', hex: '#F19A38' },
+        { name: 'Plum', hex: '#8E5B9A' },
+        { name: 'Ice', hex: '#87DCEB' }
+      ];
+
+      const hexInput = document.getElementById('hexInput');
+      const hexError = document.getElementById('hexError');
+      const hexConversionResult = document.getElementById('hexConversionResult');
+      const hexChannelNames = ['R', 'G', 'B'];
+
+      function parseHexColor(value) {
+        const normalized = value.trim().replace(/^#/, '');
+        if (!/^[\da-fA-F]{6}$/.test(normalized)) return null;
+        const hex = normalized.toUpperCase();
+        return {
+          hex: `#${hex}`,
+          pairs: [hex.slice(0, 2), hex.slice(2, 4), hex.slice(4, 6)],
+          values: [0, 2, 4].map((index) => Number.parseInt(hex.slice(index, index + 2), 16))
+        };
+      }
+
+      function updateHexConversion() {
+        const color = parseHexColor(hexInput.value);
+        const valid = color !== null;
+        hexInput.setAttribute('aria-invalid', String(!valid));
+        hexError.textContent = valid ? '' : 'Format belum tepat. Masukkan tepat 6 digit HEX, misalnya #FF6B85.';
+        hexConversionResult.hidden = !valid;
+        if (!color) return null;
+
+        hexInput.value = color.hex;
+        document.getElementById('hexColorSwatch').style.backgroundColor = color.hex;
+        document.getElementById('hexRgbValue').textContent = `rgb(${color.values.join(', ')})`;
+        color.values.forEach((value, index) => {
+          const channel = hexChannelNames[index];
+          const pair = color.pairs[index];
+          const high = Number.parseInt(pair[0], 16);
+          const low = Number.parseInt(pair[1], 16);
+          document.getElementById(`hex${channel}Pair`).textContent = pair;
+          document.getElementById(`hex${channel}Value`).textContent = value;
+          document.getElementById(`hex${channel}Formula`).textContent = `${high}×16 + ${low} = ${value}`;
+        });
+        return color;
+      }
+
+      document.getElementById('hexForm').addEventListener('submit', (event) => {
+        event.preventDefault();
+        updateHexConversion();
+      });
+      hexInput.addEventListener('input', updateHexConversion);
+      updateHexConversion();
+
+      const QUIZ_ROUNDS = 5;
+      const quiz = { round: 0, score: 0, target: null, locked: false, active: false };
+      const quizInstructions = document.getElementById('quizInstructions');
+      const quizQuestionArea = document.getElementById('quizQuestionArea');
+      const quizOptions = document.getElementById('quizOptions');
+      const quizButton = document.getElementById('quizButton');
+      const quizFeedback = document.getElementById('quizFeedback');
+
+      function colorRgb(hex) {
+        const color = parseHexColor(hex);
+        return color.values;
+      }
+
+      function renderQuizQuestion() {
+        quiz.target = palette[Math.floor(Math.random() * palette.length)];
+        quiz.locked = false;
+        quizInstructions.hidden = true;
+        quizQuestionArea.hidden = false;
+        document.getElementById('quizRound').textContent = `Soal ${quiz.round + 1} dari ${QUIZ_ROUNDS}`;
+        document.getElementById('quizScore').textContent = quiz.score;
+        document.getElementById('quizProgress').style.width = `${(quiz.round / QUIZ_ROUNDS) * 100}%`;
+        document.getElementById('quizHex').textContent = quiz.target.hex;
+        document.getElementById('quizSwatch').style.backgroundColor = quiz.target.hex;
+        quizFeedback.textContent = '';
+        quizOptions.replaceChildren();
+
+        const choices = shuffle([
+          quiz.target,
+          ...shuffle(palette.filter((item) => item !== quiz.target)).slice(0, 3)
+        ]);
+        choices.forEach((choice) => {
+          const button = document.createElement('button');
+          button.type = 'button';
+          button.className = 'quiz-answer';
+          button.textContent = `RGB(${colorRgb(choice.hex).join(', ')})`;
+          button.addEventListener('click', () => answerQuiz(button, choice));
+          quizOptions.append(button);
+        });
+        quizButton.hidden = true;
+      }
+
+      function answerQuiz(button, choice) {
+        if (quiz.locked || !quiz.active) return;
+        quiz.locked = true;
+        const correct = choice.hex === quiz.target.hex;
+        [...quizOptions.children].forEach((option) => { option.disabled = true; });
+        const correctButton = [...quizOptions.children].find((option) =>
+          option.textContent === `RGB(${colorRgb(quiz.target.hex).join(', ')})`
+        );
+        if (correctButton) correctButton.classList.add('correct');
+
+        if (correct) {
+          quiz.score += 100;
+          quizFeedback.textContent = 'Tepat! ' + quiz.target.hex.slice(1).match(/.{2}/g).map((pair) => {
+            const high = Number.parseInt(pair[0], 16);
+            const low = Number.parseInt(pair[1], 16);
+            return `${pair} = ${high}×16 + ${low} = ${high * 16 + low}`;
+          }).join(' · ');
+          quizFeedback.style.color = '#239c7a';
+        } else {
+          button.classList.add('wrong');
+          quizFeedback.textContent = `Belum tepat. Jawabannya RGB(${colorRgb(quiz.target.hex).join(', ')}). Ingat: tiap pasangan = digit pertama × 16 + digit kedua.`;
+          quizFeedback.style.color = '#d95178';
+        }
+        document.getElementById('quizScore').textContent = quiz.score;
+        document.getElementById('quizProgress').style.width = `${((quiz.round + 1) / QUIZ_ROUNDS) * 100}%`;
+        quizButton.hidden = false;
+        quizButton.innerHTML = quiz.round + 1 === QUIZ_ROUNDS ? 'Lihat hasil <span aria-hidden="true">→</span>' : 'Soal berikutnya <span aria-hidden="true">→</span>';
+      }
+
+      function finishQuiz() {
+        quiz.active = false;
+        quizInstructions.hidden = false;
+        quizQuestionArea.hidden = true;
+        quizInstructions.innerHTML = `<span aria-hidden="true">${quiz.score === QUIZ_ROUNDS * 100 ? '🏆' : '🌈'}</span><p>Latihan selesai! Skormu <strong>${quiz.score} dari ${QUIZ_ROUNDS * 100}</strong>. ${quiz.score >= 400 ? 'Kamu makin lancar membaca kode HEX!' : 'Coba ulangi rumus pasangan: digit pertama × 16 + digit kedua.'}</p>`;
+        document.getElementById('quizRound').textContent = 'Selesai';
+        document.getElementById('quizProgress').style.width = '100%';
+        quizFeedback.textContent = '';
+        quizButton.textContent = 'Ulangi latihan ✦';
+      }
+
+      function startQuiz() {
+        quiz.active = true;
+        quiz.round = 0;
+        quiz.score = 0;
+        quiz.locked = false;
+        document.getElementById('quizScore').textContent = '0';
+        renderQuizQuestion();
+      }
+
+      quizButton.addEventListener('click', () => {
+        if (!quiz.active) {
+          startQuiz();
+          return;
+        }
+        if (!quiz.locked) return;
+        quiz.round += 1;
+        if (quiz.round >= QUIZ_ROUNDS) finishQuiz();
+        else renderQuizQuestion();
+      });
+
+      function shuffle(items) {
+        return [...items].sort(() => Math.random() - .5);
+      }
+
+      function setStats() {
+        document.getElementById('score').textContent = game.score;
+        document.getElementById('streak').textContent = `${game.streak}×`;
+        document.getElementById('timer').textContent = game.timeLeft;
+        document.getElementById('progress').style.width = `${(game.round / ROUND_COUNT) * 100}%`;
+      }
+
+      function renderRound() {
+        if (game.round >= ROUND_COUNT) {
+          endGame();
+          return;
+        }
+        game.locked = false;
+        game.target = palette[Math.floor(Math.random() * palette.length)];
+        const options = shuffle([game.target, ...shuffle(palette.filter((item) => item !== game.target)).slice(0, 3)]);
+        targetSwatch.style.backgroundColor = game.target.hex;
+        targetSwatch.setAttribute('aria-label', `Warna target ${game.target.hex}`);
+        targetCode.textContent = game.mode === 'code' ? game.target.hex : '';
+        targetCode.hidden = game.mode === 'color';
+        prompt.textContent = game.mode === 'code'
+          ? 'Pilih warna yang cocok dengan kode ini.'
+          : 'Warna apa yang cocok dengan kode HEX ini?';
+        answerGrid.replaceChildren();
+
+        options.forEach((option) => {
+          const button = document.createElement('button');
+          button.type = 'button';
+          button.className = `answer${game.mode === 'code' ? ' color-option' : ''}`;
+          if (game.mode === 'code') {
+            const swatch = document.createElement('span');
+            swatch.className = 'answer-color';
+            swatch.style.backgroundColor = option.hex;
+            swatch.setAttribute('aria-hidden', 'true');
+            button.append(swatch, document.createTextNode(option.name));
+            button.setAttribute('aria-label', `Warna ${option.name}`);
+          } else {
+            button.textContent = option.hex;
+          }
+          button.addEventListener('click', () => answer(button, option));
+          answerGrid.append(button);
+        });
+        setStats();
+      }
+
+      function answer(button, choice) {
+        if (game.locked || !game.active) return;
+        game.locked = true;
+        const correct = choice === game.target;
+        [...answerGrid.children].forEach((item) => { item.disabled = true; });
+        const correctIndex = [...answerGrid.children].findIndex((item) =>
+          game.mode === 'code'
+            ? item.getAttribute('aria-label') === `Warna ${game.target.name}`
+            : item.textContent === game.target.hex
+        );
+        if (correctIndex >= 0) answerGrid.children[correctIndex].classList.add('correct');
+
+        if (correct) {
+          game.streak += 1;
+          const points = 100 + Math.min(game.streak - 1, 5) * 20;
+          game.score += points;
+          feedback.textContent = `Betul! +${points} poin${game.streak > 1 ? ` · combo ${game.streak}×, lanjutkan!` : ' · mantap!'}`;
+          feedback.style.color = '#239c7a';
+        } else {
+          game.streak = 0;
+          button.classList.add('wrong');
+          feedback.textContent = `Belum tepat! Jawabannya ${game.target.name} (${game.target.hex}). Coba lagi di ronde berikutnya.`;
+          feedback.style.color = '#d95178';
+        }
+        setStats();
+        setTimeout(() => {
+          if (!game.active) return;
+          game.round += 1;
+          if (game.round >= ROUND_COUNT) endGame();
+          else renderRound();
+        }, 850);
+      }
+
+      function endGame() {
+        game.active = false;
+        clearInterval(game.timerId);
+        gameContent.hidden = true;
+        gameResult.classList.add('visible');
+        const message = game.score >= 700 ? 'Kamu jago banget!' : game.score >= 400 ? 'Makin peka sama warna!' : 'Awal yang bagus!';
+        gameResult.innerHTML = `<div class="result-emoji" aria-hidden="true">${game.score >= 700 ? '🏆' : game.score >= 400 ? '🌈' : '✨'}</div><h3>${message}</h3><p>Skor akhir kamu <strong>${game.score} poin</strong> dari ${ROUND_COUNT} ronde.</p><button class="button primary" id="restartGame" type="button">Main lagi <span aria-hidden="true">↻</span></button>`;
+        document.getElementById('restartGame').addEventListener('click', startGame);
+        document.getElementById('progress').style.width = `${(game.round / ROUND_COUNT) * 100}%`;
+      }
+
+      function startGame() {
+        clearInterval(game.timerId);
+        game.active = true;
+        game.round = 0;
+        game.score = 0;
+        game.streak = 0;
+        game.timeLeft = 45;
+        game.locked = false;
+        gameContent.hidden = false;
+        gameResult.classList.remove('visible');
+        gameResult.replaceChildren();
+        feedback.textContent = 'Jawaban benar = 100 poin. Combo bikin skor makin tinggi!';
+        feedback.style.color = '';
+        startButton.textContent = 'Mulai main ✦';
+        setStats();
+        renderRound();
+        game.timerId = setInterval(() => {
+          game.timeLeft -= 1;
+          setStats();
+          if (game.timeLeft <= 0) endGame();
+        }, 1000);
+      }
+
+      document.querySelectorAll('.mode-button').forEach((button) => {
+        button.addEventListener('click', () => {
+          if (game.active) return;
+          game.mode = button.dataset.mode;
+          document.querySelectorAll('.mode-button').forEach((item) => item.setAttribute('aria-pressed', String(item === button)));
+          prompt.textContent = game.mode === 'code'
+            ? 'Cocokkan kode ini dengan warna yang tepat.'
+            : 'Pilih mode, lalu tekan mulai untuk menebak warna dari kode HEX.';
+        });
+      });
+      startButton.addEventListener('click', startGame);
+      setStats();
+      updatePlayground();
+    })();
+  </script>
+</body>
+</html>
